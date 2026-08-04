@@ -1,30 +1,30 @@
 # DouPoCQ_WolrdBooks
-自用
 
-## 本地版本快照
+《斗破苍穹》SillyTavern 世界书项目。
 
-首次配置后，每次修改完成可运行：
+本仓库仅发布《斗破苍穹SP》相关内容。
 
-```powershell
-.\snapshot.ps1 -Message "本次修改说明"
+## 仓库内容
+
+```text
+DouPoCQ_WolrdBooks/
+├── README.md
+├── 斗破苍穹SP.yaml    # 世界书总入口与条目配置
+└── 斗破苍穹SP/        # 世界书条目、变量、脚本及前端源文件
 ```
 
-快照脚本会在当前进程内处理仓库所有权检查，不需要修改全局 Git 配置。
+## 使用说明
 
-查看历史：
+- `斗破苍穹SP.yaml` 负责组织世界书条目的顺序、启用状态及源文件路径。
+- `斗破苍穹SP/` 保存该世界书使用的公开源文件。
+- 使用支持该 YAML 项目结构的工具进行编辑、构建或导入。
 
-```powershell
-git -c safe.directory="E:/Sillystavern_CharCards/写卡工作区/DouPoCQ_WolrdBooks" log --oneline --all
-```
+## 发布约定
 
-恢复单个文件到最近一次提交：
+本仓库只跟踪并推送以下路径：
 
-```powershell
-.\restore.ps1 -Commit HEAD -Path "文件路径"
-```
+- `斗破苍穹SP/`
+- `斗破苍穹SP.yaml`
+- `README.md`
 
-恢复整个工作区到指定版本前，请先确认没有需要保留的未提交修改：
-
-```powershell
-.\restore.ps1 -Commit 提交编号
-```
+本地草稿、原文、工作记录、模板、同步配置及辅助工具均不属于本仓库发布内容。
