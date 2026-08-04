@@ -1,0 +1,2035 @@
+```html
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap');
+      @import url('https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css');
+
+      /* 默认主题：夜晚蓝 */
+      :root,
+      :root[data-theme='night'] {
+        --bg-color: #0f172a;
+        --primary: #38bdf8;
+        --accent: #818cf8;
+        --accent-light: #c7d2fe;
+        --gold: #fbbf24;
+        --danger: #f43f5e;
+        --success: #10b981;
+        --text-main: #f8fafc;
+        --text-sub: #cbd5e1;
+        --card-bg: #1e293b;
+        --glass-bg: rgba(30, 41, 59, 0.85);
+        --border-color: rgba(255, 255, 255, 0.1);
+        --font-serif: 'Libre Baskerville', serif;
+        --font-tech: 'Rajdhani', sans-serif;
+        --header-mask: linear-gradient(to bottom, rgba(15, 23, 42, 0.4) 0%, #0f172a 100%);
+      }
+
+      /* 羊皮纸主题 */
+      :root[data-theme='parchment'] {
+        --bg-color: #f4ecd8;
+        --primary: #5c4033;
+        --accent: #8b5a2b;
+        --accent-light: #cd853f;
+        --gold: #b8860b;
+        --danger: #8b0000;
+        --success: #2e7d32;
+        --text-main: #3e2723;
+        --text-sub: #5d4037;
+        --card-bg: #fdfaf3;
+        --glass-bg: rgba(253, 250, 243, 0.85);
+        --border-color: rgba(92, 64, 51, 0.2);
+        --header-mask: linear-gradient(to bottom, rgba(244, 236, 216, 0.2) 0%, #f4ecd8 100%);
+      }
+
+      /* 暗酒红主题 */
+      :root[data-theme='burgundy'] {
+        --bg-color: #2b0f15;
+        --primary: #ffb6c1;
+        --accent: #d21f3c;
+        --accent-light: #ff6b81;
+        --gold: #ffd700;
+        --danger: #ff0000;
+        --success: #10b981;
+        --text-main: #fdfbf7;
+        --text-sub: #dcdde1;
+        --card-bg: #3d141d;
+        --glass-bg: rgba(61, 20, 29, 0.85);
+        --border-color: rgba(255, 182, 193, 0.2);
+        --header-mask: linear-gradient(to bottom, rgba(43, 15, 21, 0.4) 0%, #2b0f15 100%);
+      }
+
+      /* 古铜金主题 */
+      :root[data-theme='bronze'] {
+        --bg-color: #1a1a1a;
+        --primary: #d4af37;
+        --accent: #cd7f32;
+        --accent-light: #b8860b;
+        --gold: #ffd700;
+        --danger: #c0392b;
+        --success: #10b981;
+        --text-main: #f5f5f5;
+        --text-sub: #a0a0a0;
+        --card-bg: #262626;
+        --glass-bg: rgba(38, 38, 38, 0.85);
+        --border-color: rgba(212, 175, 55, 0.3);
+        --header-mask: linear-gradient(to bottom, rgba(26, 26, 26, 0.4) 0%, #1a1a1a 100%);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-tech);
+        background: transparent;
+        transition: all 0.3s ease;
+      }
+
+      .status-card {
+        width: 100%;
+        color: var(--text-main);
+        background-color: var(--bg-color);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      /* 顶部主题色渐变装饰条 */
+      .status-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 120px;
+        background: linear-gradient(180deg, var(--accent) 0%, var(--bg-color) 100%);
+        opacity: 0.15;
+        z-index: 0;
+        pointer-events: none;
+        transition: background 0.3s ease;
+      }
+
+      .status-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .card-header {
+        padding: 15px;
+      }
+
+      /* 玻璃拟态卡片 */
+      .header-card-glass {
+        background: var(--glass-bg);
+        padding: 12px;
+        border-radius: 16px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: all 0.3s ease;
+      }
+
+      /* 主题切换按钮与菜单 - 书签变大并确保尖角 */
+      .theme-switcher-wrapper {
+        position: absolute;
+        top: 0;
+        right: 25%;
+        z-index: 10;
+        display: flex;
+        gap: 8px;
+      }
+
+      .bookmark-btn {
+        background: rgba(30, 41, 59, 0.72);
+        border: 1px solid var(--border-color);
+        border-top: none;
+        color: var(--text-main);
+        width: 44px;
+        height: 60px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 10px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        backdrop-filter: blur(12px);
+        transition: all 0.2s;
+        clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+        filter: drop-shadow(0 0 1px var(--border-color));
+      }
+
+      .bookmark-btn:hover {
+        background: var(--card-bg);
+        color: var(--accent);
+      }
+
+      .theme-menu {
+        display: none;
+        position: absolute;
+        top: 75px;
+        right: 0;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 5px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        width: 100px;
+        z-index: 20;
+      }
+
+      .theme-menu.show {
+        display: block;
+        animation: dropDown 0.2s ease;
+      }
+
+      @keyframes dropDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes spinRefresh {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spin-anim {
+        animation: spinRefresh 0.5s ease-in-out;
+      }
+
+      .theme-option {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        color: var(--text-main);
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+      .theme-option:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      /* 世界状态栏 */
+      .world-info-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-main);
+        opacity: 0.9;
+      }
+      .world-info-row i {
+        color: var(--accent);
+      }
+
+      /* 头像与基础信息 */
+      .char-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        background: var(--card-bg);
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border: 2px solid var(--border-color);
+        flex-shrink: 0;
+      }
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .char-details {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .char-details-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .char-details-top h1 {
+        font-family: var(--font-serif);
+        font-size: 1.4rem;
+        margin: 0;
+        color: var(--primary);
+      }
+      .char-basic-info {
+        font-size: 0.75rem;
+        color: var(--text-sub);
+      }
+      .class-tag {
+        display: inline-block;
+        background: rgba(0, 0, 0, 0.4);
+        color: var(--text-main);
+        padding: 3px 8px;
+        font-size: 0.7rem;
+        border-radius: 6px;
+        font-weight: 600;
+        border: 1px solid var(--border-color);
+        align-self: flex-start;
+      }
+
+      .char-extra-info {
+        font-size: 0.75rem;
+        color: var(--text-main);
+        line-height: 1.3;
+        margin-top: 4px;
+        padding-top: 4px;
+        border-top: 1px dashed var(--border-color);
+      }
+      .char-extra-row {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 2px;
+      }
+      .char-extra-label {
+        color: var(--text-sub);
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      /* 进度条统一样式 */
+      .bar-container {
+        margin-top: 5px;
+      }
+      .bar-label-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.65rem;
+        font-weight: 700;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        color: var(--text-sub);
+      }
+      .bar-bg {
+        height: 6px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+      }
+
+      .fill-soul {
+        background: linear-gradient(90deg, var(--accent), var(--primary));
+      }
+
+      /* Tab 导航 - 修改为单排滑动/自适应排列 */
+      .tab-bar {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 4px;
+        padding: 0 10px;
+        margin-top: 5px;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .tab-bar::-webkit-scrollbar {
+        display: none;
+      }
+      .tab-item {
+        flex: 1 0 auto;
+        padding: 8px 6px;
+        border: none;
+        background: rgba(0, 0, 0, 0.1);
+        font-family: var(--font-tech);
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-sub);
+        border-radius: 8px 8px 0 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+      .tab-item:hover {
+        background: var(--card-bg);
+        color: var(--primary);
+      }
+      .tab-item.active {
+        background: var(--card-bg);
+        color: var(--primary);
+        border-top: 2px solid var(--accent);
+      }
+
+      /* 内容区域 */
+      .tab-content {
+        background: var(--card-bg);
+        padding: 15px;
+        min-height: 200px;
+        border-radius: 0 0 12px 12px;
+        transition: background 0.3s ease;
+      }
+      .tab-pane {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+      .tab-pane.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 通用卡片样式 */
+      .data-card {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+      .card-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+      }
+      .card-tag {
+        font-size: 0.65rem;
+        background: rgba(108, 92, 231, 0.1);
+        color: var(--accent);
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid var(--accent);
+      }
+
+      .data-row {
+        display: flex;
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+        line-height: 1.4;
+      }
+      .data-label {
+        font-weight: 700;
+        color: var(--text-sub);
+        width: 60px;
+        flex-shrink: 0;
+      }
+      .data-val {
+        color: var(--text-main);
+        flex: 1;
+      }
+
+      /* 内部子条目 */
+      .sub-item {
+        background: var(--card-bg);
+        border-radius: 6px;
+        padding: 8px;
+        margin-top: 6px;
+        border-left: 3px solid var(--accent);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .sub-item-head {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+        color: var(--text-main);
+      }
+      .sub-item-desc {
+        font-size: 0.7rem;
+        color: var(--text-sub);
+      }
+
+      /* 羁绊列表样式 - 高级质感美化 */
+      .bond-list-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .bond-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        padding: 12px;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .bond-item:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .bond-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        cursor: pointer;
+        gap: 12px;
+      }
+      .bond-avatar-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        flex-shrink: 0;
+        position: relative;
+        background: rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .bond-avatar-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .bond-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .bond-name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .bond-meta-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 2px;
+      }
+      .bond-tag {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        color: var(--text-sub);
+        border: 1px solid var(--border-color);
+      }
+
+      .bond-thought-preview {
+        font-size: 0.75rem;
+        color: var(--text-sub);
+        font-style: italic;
+        opacity: 0.8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 4px;
+      }
+      .bond-thought-preview::before,
+      .bond-thought-preview::after {
+        content: '"';
+        color: var(--accent);
+      }
+
+      .bond-favor-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-family: var(--font-tech);
+        background: rgba(244, 63, 94, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(244, 63, 94, 0.2);
+      }
+
+      /* ===== 羁绊新布局：左列表 + 右详情 ===== */
+      .bond-section-container {
+        display: flex;
+        gap: 12px;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        min-height: 300px;
+      }
+
+      .bond-section-container.mode-detail {
+        gap: 8px;
+      }
+
+      .bond-list-pane {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .bond-list-pane::-webkit-scrollbar {
+        width: 4px;
+      }
+      .bond-list-pane::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .bond-list-pane::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      .bond-section-container.mode-detail .bond-list-pane {
+        flex: 0 0 160px;
+        padding: 8px;
+        gap: 6px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      /* 列表项卡片 */
+      .bond-item-new {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 10px 14px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        gap: 10px;
+        overflow: hidden;
+      }
+      .bond-item-new:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+      .bond-item-new.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-light);
+      }
+
+      .bond-section-container.mode-detail .bond-item-new {
+        padding: 8px 10px;
+        border-radius: 10px;
+        gap: 8px;
+        min-height: auto;
+      }
+      .bond-section-container.mode-detail .bond-item-new:hover {
+        transform: none;
+      }
+      .bond-section-container.mode-detail .bond-item-new.active {
+        box-shadow: 0 0 0 2px var(--accent-light);
+      }
+
+      .bond-item-new .bond-avatar-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        overflow: hidden;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .bond-item-new .bond-avatar-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .bond-item-new-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .bond-item-new-name {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .bond-item-new-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .bond-item-new-tag {
+        font-size: 0.62rem;
+        padding: 1px 6px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.15);
+        color: var(--text-sub);
+        border: 1px solid var(--border-color);
+        white-space: nowrap;
+      }
+      .bond-item-new-tag.nearby {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--success);
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+
+      .bond-item-new-thought {
+        font-size: 0.7rem;
+        color: var(--text-sub);
+        font-style: italic;
+        opacity: 0.7;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .bond-item-new-thought::before {
+        content: '"';
+        color: var(--accent);
+      }
+      .bond-item-new-thought::after {
+        content: '"';
+        color: var(--accent);
+      }
+
+      .bond-section-container.mode-detail .bond-item-new-thought {
+        display: none;
+      }
+
+      .bond-item-new-compact {
+        display: none;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-main);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .bond-section-container.mode-detail .bond-item-new-compact {
+        display: block;
+        flex: 1;
+        min-width: 0;
+      }
+      .bond-section-container.mode-detail .bond-item-new-info {
+        display: none;
+      }
+      .bond-section-container.mode-detail .bond-favor-badge {
+        display: none;
+      }
+      .bond-section-container.mode-detail .bond-avatar-box {
+        width: 36px;
+        height: 36px;
+      }
+
+      /* 详情面板 */
+      .bond-detail-pane {
+        flex: 0 0 0;
+        width: 0;
+        opacity: 0;
+        background: var(--card-bg);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid var(--border-color);
+        pointer-events: none;
+        min-height: 300px;
+      }
+      .bond-section-container.mode-detail .bond-detail-pane {
+        flex: 1;
+        width: auto;
+        opacity: 1;
+        pointer-events: auto;
+        min-height: 300px;
+        max-height: 480px;
+        overflow-y: auto;
+      }
+
+      .bdp-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        flex-shrink: 0;
+      }
+      .bdp-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 2px solid var(--border-color);
+        background: var(--bg-color);
+      }
+      .bdp-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .bdp-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .bdp-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary);
+        font-family: var(--font-serif);
+      }
+      .bdp-meta {
+        font-size: 0.7rem;
+        color: var(--text-sub);
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 3px;
+      }
+      .bdp-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0, 0, 0, 0.15);
+        color: var(--text-main);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .bdp-close:hover {
+        background: var(--danger);
+        transform: rotate(90deg);
+        color: #fff;
+      }
+
+      .bdp-body {
+        padding: 14px 16px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .bdp-body::-webkit-scrollbar {
+        width: 4px;
+      }
+      .bdp-body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      .bdp-section {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .bdp-section-title {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 4px;
+      }
+      .bdp-section-title i {
+        font-size: 0.8rem;
+      }
+      .bdp-row {
+        display: flex;
+        gap: 8px;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.1);
+      }
+      .bdp-row-label {
+        font-weight: 600;
+        color: var(--text-sub);
+        flex-shrink: 0;
+        min-width: 44px;
+      }
+      .bdp-row-val {
+        color: var(--text-main);
+        flex: 1;
+        word-break: break-word;
+      }
+      .bdp-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px 8px;
+      }
+      .bdp-tag {
+        font-size: 0.68rem;
+        padding: 2px 8px;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.15);
+        color: var(--text-sub);
+        border: 1px solid var(--border-color);
+      }
+      .bd-info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.1);
+        margin-bottom: 6px;
+        border-left: 2px solid var(--accent);
+      }
+      .bd-info-name {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+      .bd-info-grid {
+        display: flex;
+        gap: 8px;
+      }
+      .bd-info-left {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .bd-info-desc {
+        font-size: 0.68rem;
+        color: var(--text-sub);
+        line-height: 1.4;
+      }
+      .bd-info-effect {
+        font-size: 0.7rem;
+        color: var(--text-main);
+        line-height: 1.4;
+      }
+      .bd-info-right {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 3px;
+        max-width: 40%;
+      }
+      .bd-info-tag {
+        font-size: 0.62rem;
+        color: var(--text-sub);
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .empty-hint {
+        text-align: center;
+        color: var(--text-sub);
+        font-size: 0.75rem;
+        padding: 20px;
+        font-style: italic;
+      }
+
+      /* ===== 手机端适配：详情面板覆盖列表，不再左右挤 ===== */
+      @media (max-width: 520px) {
+        .theme-switcher-wrapper {
+          right: 12px;
+          gap: 4px;
+        }
+
+        .bookmark-btn {
+          width: 34px;
+          height: 46px;
+          padding-top: 7px;
+          font-size: 0.95rem;
+          background: rgba(30, 41, 59, 0.58);
+        }
+
+        .theme-menu {
+          top: 54px;
+          width: 86px;
+          background: rgba(30, 41, 59, 0.82);
+          backdrop-filter: blur(14px);
+        }
+
+        .bond-section-container {
+          position: relative;
+        }
+
+        /* 手机端列表始终占满宽度 */
+        .bond-section-container .bond-list-pane {
+          flex: 1 1 100% !important;
+          max-width: 100%;
+        }
+
+        /* 详情面板改为绝对定位覆盖层，占满整个容器 */
+        .bond-section-container.mode-detail .bond-detail-pane {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100% !important;
+          max-height: none;
+          z-index: 20;
+          border-radius: 12px;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+          background: var(--card-bg);
+          flex: none;
+        }
+
+        /* 列表项在手机端保持完整信息展示（不缩成紧凑模式） */
+        .bond-section-container.mode-detail .bond-item-new-info {
+          display: flex;
+        }
+        .bond-section-container.mode-detail .bond-item-new-compact {
+          display: none;
+        }
+        .bond-section-container.mode-detail .bond-favor-badge {
+          display: flex;
+        }
+        .bond-section-container.mode-detail .bond-item-new-thought {
+          display: block;
+        }
+        .bond-section-container.mode-detail .bond-avatar-box {
+          width: 44px;
+          height: 44px;
+        }
+        .bond-section-container.mode-detail .bond-item-new {
+          padding: 10px 14px;
+          border-radius: 12px;
+          gap: 10px;
+        }
+
+        /* 关闭按钮在手机端更大更容易点击 */
+        .bdp-close {
+          width: 34px;
+          height: 34px;
+          top: 8px;
+          right: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="module">
+      function getCore() {
+        try {
+          const win = window.parent || window;
+          const $ = window.jQuery || win.jQuery;
+          return { window: win, $ };
+        } catch (e) {
+          return { window: window, $: window.jQuery };
+        }
+      }
+
+      const { window: win, $ } = getCore();
+
+      /* 安全获取变量的辅助函数 */
+      function safeGet(obj, path, def = '') {
+        if (!obj) return def;
+        return _.get(obj, path, def);
+      }
+
+      /* ========== 立绘/头像 辅助函数 ========== */
+      const AVATAR_BASE_URL = 'https://raw.githubusercontent.com/INK-996/imgbed/main/%E6%96%97%E4%BA%8C/';
+      const AVATAR_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp'];
+      const AVATAR_SUFFIXES = ['', '1', '2', '3', '4', '5'];
+
+      // 头像兜底方案：无图床图片时仅显示角色名首字（彩色方块）
+      function applyImageFallback(element, text) {
+        if (!element) return;
+        const colors = ['#e57373', '#ba68c8', '#7986cb', '#4db6ac', '#a1887f', '#90a4ae', '#f06292', '#4dd0e1'];
+        const nameText = text ? text.trim() : '?';
+        // 仅取首字显示，简洁美观
+        const displayChar = nameText.charAt(0);
+        // 用完整名称哈希取色，同一人物始终同色
+        const colorIdx = Math.abs(nameText.split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 0)) % colors.length;
+        const color = colors[colorIdx];
+        element.innerHTML = '';
+        element.style.backgroundImage = 'none';
+        element.style.backgroundColor = color;
+        element.style.display = 'flex';
+        element.style.justifyContent = 'center';
+        element.style.alignItems = 'center';
+        element.style.color = '#fff';
+        element.style.fontWeight = 'bold';
+        element.style.lineHeight = '1.2';
+        element.style.textAlign = 'center';
+        element.style.overflow = 'hidden';
+        const size = Math.min(element.offsetWidth || 85, element.offsetHeight || 85);
+        // 仅显示单字，字号可更大更清晰
+        const fontSize = Math.min(40, Math.max(16, Math.floor(size * 0.6)));
+        element.style.fontSize = fontSize + 'px';
+        element.textContent = displayChar;
+      }
+
+      // 构建候选头像 URL 列表（localStorage 手动选图 → 自定义上传 → 括号名拆分 → 后缀变体 → 多扩展名）
+      function buildAvatarSources(characterName) {
+        const sources = [];
+
+        // 1. 检查用户手动在图库中选定的头像
+        const manualChoice = localStorage.getItem('st-beautify-ui-selected-avatar-' + characterName);
+        if (manualChoice) sources.push(manualChoice);
+
+        // 2. 检查自定义上传头像
+        const customUpload = localStorage.getItem('st-beautify-ui-avatar-' + characterName);
+        if (customUpload) sources.push(customUpload);
+
+        // 3. 拆解角色名：分离括号内容（如：唐舞桐(王冬) → 唐舞桐、王冬）
+        let baseNames = [];
+        const cleanName = characterName.replace(/[\(（].*?[\)）]/g, '').trim();
+        if (cleanName) baseNames.push(cleanName);
+        const match = characterName.match(/[\(（](.*?)[\)）]/);
+        if (match && match[1]) baseNames.push(match[1].trim());
+        baseNames = [...new Set(baseNames)];
+
+        // 4. 生成所有组合：名字 × 后缀(空/1~5) × 扩展名
+        baseNames.forEach(name => {
+          AVATAR_SUFFIXES.forEach(suf => {
+            AVATAR_EXTENSIONS.forEach(ext => {
+              const url = AVATAR_BASE_URL + encodeURIComponent(name + suf) + '.' + ext;
+              if (!sources.includes(url)) sources.push(url);
+            });
+          });
+        });
+
+        return sources;
+      }
+
+      // ========== 头像加载缓存 ==========
+      // 缓存每个角色的头像解析结果，避免重复搜索图床导致闪烁
+      // 值: { status: 'image', url: '...' } 或 { status: 'fallback' }
+      const avatarCache = new Map();
+
+      // 为 img 元素设置头像：先立即显示首字兜底，再后台静默搜索图床（仅搜一遍）
+      function setupAvatarImage(imgElement, containerElement, characterName) {
+        if (!imgElement || !containerElement) return;
+
+        const cleanName = characterName.replace(/[\(（].*?[\)）]/g, '').trim();
+        const cacheKey = characterName;
+
+        // 暂时关闭人物头像联网匹配，仅保留大字头像。
+        applyImageFallback(containerElement, cleanName || characterName);
+        // Network avatar matching disabled; keep letter avatar only.
+        applyImageFallback(containerElement, cleanName || characterName);
+        avatarCache.set(cacheKey, { status: 'fallback' });
+        imgElement.removeAttribute('src');
+        imgElement.onerror = null;
+        imgElement.onload = null;
+        return;
+
+        // 1. 检查缓存：已解析过的角色直接使用缓存结果，不再重复搜索
+        const cached = avatarCache.get(cacheKey);
+        if (cached) {
+          if (cached.status === 'image') {
+            // 已确认有图床图片，直接设置 src
+            imgElement.src = cached.url;
+            imgElement.style.display = '';
+            imgElement.onerror = null;
+            imgElement.onload = null;
+          } else {
+            // 已确认无图床图片，直接使用首字兜底
+            applyImageFallback(containerElement, cleanName || characterName);
+          }
+          return;
+        }
+
+        // 2. 未缓存：先立即显示首字兜底，避免空白/闪烁
+        applyImageFallback(containerElement, cleanName || characterName);
+
+        // 3. 后台静默搜索图床（整个链只跑一遍，不重复）
+        const sources = buildAvatarSources(characterName);
+        let sourceIndex = 0;
+        let resolved = false; // 防止 onload/onerror 竞态
+
+        const tryNext = function () {
+          if (resolved) return;
+          if (sourceIndex >= sources.length) {
+            // 全部源尝试完毕，缓存为 fallback，保持首字显示
+            resolved = true;
+            avatarCache.set(cacheKey, { status: 'fallback' });
+            imgElement.onerror = null;
+            imgElement.onload = null;
+            return;
+          }
+          imgElement.src = sources[sourceIndex];
+          sourceIndex++;
+        };
+
+        imgElement.onload = function () {
+          if (resolved) return;
+          resolved = true;
+          // 图片加载成功：缓存 URL，清除兜底样式，显示图片
+          avatarCache.set(cacheKey, { status: 'image', url: imgElement.src });
+          // 重置容器内联样式，让 CSS 类样式生效
+          containerElement.style.cssText = '';
+          containerElement.innerHTML = '';
+          containerElement.appendChild(imgElement);
+          imgElement.style.display = '';
+          imgElement.onerror = null;
+          imgElement.onload = null;
+        };
+
+        imgElement.onerror = tryNext;
+        tryNext();
+      }
+
+      // 渲染后扫描所有带 data-char-name 的图片并设置加载链
+      function setupAllAvatars() {
+        document.querySelectorAll('img[data-char-name]').forEach(img => {
+          setupAvatarImage(img, img.parentElement, img.dataset.charName);
+        });
+      }
+
+      /* 渲染整个状态栏 */
+      function renderStatusBar() {
+        const allVars = typeof getAllVariables === 'function' ? getAllVariables() : {};
+        const data = safeGet(allVars, 'stat_data', {});
+
+        const timeStr = safeGet(data, '世界状态.时间', safeGet(data, '全局设定.世界状态.时间', safeGet(data, '世界设定.时间', '未知时间')));
+        const locStr = safeGet(data, '世界状态.位置', safeGet(data, '全局设定.世界状态.位置', safeGet(data, '世界设定.位置', '未知地点')));
+        const sceneType = safeGet(data, '世界状态.场景', safeGet(data, '全局设定.世界状态.场景', safeGet(data, '世界设定.场景', '日常')));
+        const presentChars = safeGet(data, '世界状态.在场人物', safeGet(data, '全局设定.世界状态.在场人物', safeGet(data, '世界设定.在场人物', '')));
+
+        const storyMonitor = safeGet(data, '任务契约', {});
+
+        const name = safeGet(data, '主角.基本信息.姓名', '无名氏');
+        const age = safeGet(data, '主角.基本信息.年龄', '未知');
+        const gender = safeGet(data, '主角.基本信息.性别', '未知');
+        const race = safeGet(data, '主角.基本信息.种族', '人类');
+        const identity = safeGet(data, '主角.基本信息.身份', '未知');
+        const appearance = safeGet(data, '主角.基本信息.外貌', '暂无描述');
+        const background = safeGet(data, '主角.基本信息.背景', '暂无描述');
+
+        const realm = safeGet(data, '主角.斗气修炼.斗气境界', '未修炼');
+        const progress = Number(safeGet(data, '主角.斗气修炼.修炼进度', 0));
+        const spiritRealm = safeGet(data, '主角.灵魂力.灵魂境界', safeGet(data, '主角.灵魂力量.灵魂境界', '未知'));
+        const innateSoulPower = safeGet(data, '主角.炼药术.炼药师等级', '未知');
+        const anchorTime = '';
+
+        const skills = safeGet(data, '主角.技能与能力', {});
+        const items = safeGet(data, '主角.物品栏', {});
+
+        const avatarUrl =
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%23818cf8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' fill='url(%23bg)'/%3E%3Cg fill='%23fff' opacity='0.9'%3E%3Ccircle cx='60' cy='42' r='18'/%3E%3Cpath d='M60 62c-20 0-36 12-36 28v14h72V90c0-16-16-28-36-28z'/%3E%3C/g%3E%3C/svg%3E";
+
+        let html = `
+        <div class="status-card">
+          <!-- 主题切换按钮区 -->
+          <div class="theme-switcher-wrapper">
+            <div class="bookmark-btn" id="themeToggleBtn" title="切换主题"><i class="ri-palette-line"></i></div>
+            <div class="bookmark-btn" id="refreshBtn" title="刷新数据"><i class="ri-refresh-line"></i></div>
+            <div class="theme-menu" id="themeMenu">
+              <div class="theme-option" data-theme-val="night">夜晚蓝</div>
+              <div class="theme-option" data-theme-val="parchment">羊皮纸</div>
+              <div class="theme-option" data-theme-val="burgundy">暗酒红</div>
+              <div class="theme-option" data-theme-val="bronze">古铜金</div>
+            </div>
+          </div>
+
+          <div class="card-header">
+            <div class="header-card-glass">
+              <div class="world-info-row"><i class="ri-map-pin-time-line"></i> ${timeStr} | ${locStr}</div>
+              <div class="world-info-row" style="margin-top:2px"><i class="ri-movie-2-line"></i> ${sceneType} ${presentChars ? `| 在场: ${presentChars}` : ''}</div>
+
+              <div class="char-header">
+                <div class="avatar"><img src="${avatarUrl}" alt="Avatar"></div>
+                <div class="char-details">
+                  <div class="char-details-top">
+                    <h1>${name}</h1>
+                    <span class="char-basic-info">${gender} | ${age} | ${race}</span>
+                  </div>
+                  <div class="class-tag">${realm} · ${identity}</div>
+                  <div class="char-extra-info">
+                    <div class="char-extra-row"><span class="char-extra-label">外貌:</span><span>${appearance}</span></div>
+                    <div class="char-extra-row"><span class="char-extra-label">背景:</span><span>${background}</span></div>
+                    <div class="char-extra-row"><span class="char-extra-label">炼药师等级:</span><span>${innateSoulPower}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bar-container">
+                <div class="bar-label-row">
+                  <span style="color:var(--primary)">斗气修炼 (${progress}%)</span>
+                  <span style="color:var(--accent)">灵魂境界: ${spiritRealm}</span>
+                </div>
+                <div class="bar-bg">
+                  <div class="bar-fill fill-soul" style="width:${progress}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-bar">
+            <button class="tab-item" data-tab="story"><i class="ri-film-line"></i> 任务剧情</button>
+            <button class="tab-item active" data-tab="wuhun"><i class="ri-fire-line"></i> 异火技能</button>
+            <button class="tab-item" data-tab="equip"><i class="ri-shield-star-line"></i> 装备信息</button>
+            <button class="tab-item" data-tab="god"><i class="ri-flask-line"></i> 炼药与状态</button>
+            <button class="tab-item" data-tab="items"><i class="ri-shopping-bag-line"></i> 背包物品</button>
+            <button class="tab-item" data-tab="bonds"><i class="ri-group-line"></i> 羁绊列表</button>
+          </div>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="pane-wuhun">
+              ${renderWuHun(safeGet(data, '主角.异火状态', {}), skills)}
+            </div>
+            <div class="tab-pane" id="pane-equip">
+              ${renderEquips(safeGet(data, '主角.装备信息', {}))}
+            </div>
+            <div class="tab-pane" id="pane-god">
+              ${renderGodAndSpirit(safeGet(data, '主角.炼药术', {}), safeGet(data, '主角.当前状态', {}))}
+            </div>
+            <div class="tab-pane" id="pane-story">
+              ${renderStoryMonitor(storyMonitor)}
+            </div>
+            <div class="tab-pane" id="pane-items">
+              ${renderItems(items)}
+            </div>
+            <div class="tab-pane" id="pane-bonds">
+              ${renderBonds(safeGet(data, '关系列表', {}))}
+            </div>
+          </div>
+        </div>
+      `;
+
+        $('#app').html(html);
+        setupAllAvatars();
+        bindEvents();
+        applySavedTheme();
+      }
+
+      function getEntryType(info, fallback = '其他') {
+        if (!info || typeof info !== 'object') return fallback;
+        return String(info.类型 || info.标签 || fallback).replace(/[\[\]]/g, '') || fallback;
+      }
+
+      function renderInfoRows(info, labels = {}) {
+        if (!info || typeof info !== 'object') return `<div class="sub-item-desc">${info || '暂无'}</div>`;
+        const rows = [];
+        if (info.描述) rows.push(`<div class="sub-item-desc" style="color:var(--text-main)">${labels.desc || '描述'}: ${info.描述}</div>`);
+        if (info.效果) rows.push(`<div class="sub-item-desc">${labels.effect || '效果'}: ${info.效果}</div>`);
+        if (info.结束时间) rows.push(`<div class="sub-item-desc">${labels.end || '结束'}: ${info.结束时间}</div>`);
+        return rows.join('');
+      }
+
+      function renderGroupedSubItems(obj, options = {}) {
+        if ($.isEmptyObject(obj)) return options.empty || '';
+
+        const groups = {};
+        $.each(obj, (name, info) => {
+          const type = getEntryType(info, options.fallbackType || '其他');
+          if (!groups[type]) groups[type] = [];
+          groups[type].push({ name, info: info || {} });
+        });
+
+        let html = '';
+        const order = options.order || [];
+        const rendered = new Set();
+        const renderGroup = (type, items) => {
+          rendered.add(type);
+          const color = options.color || 'var(--accent-light)';
+          const icon = options.icon || 'ri-shapes-line';
+          html += `<h4 style="font-size:0.72rem; margin:12px 0 4px 0; color:${color}; display:flex; align-items:center; gap:4px;"><i class="${icon}"></i> ${type}</h4>`;
+          items.forEach(({ name, info }) => {
+            const tag = info.标签 || type;
+            html += `
+              <div class="sub-item" style="border-left-color:${color}">
+                <div class="sub-item-head">
+                  <span><b>${name}</b></span>
+                  <span class="card-tag">${tag}</span>
+                </div>
+                ${renderInfoRows(info)}
+              </div>
+            `;
+          });
+        };
+
+        order.forEach(type => {
+          if (groups[type]) renderGroup(type, groups[type]);
+        });
+        $.each(groups, (type, items) => {
+          if (!rendered.has(type)) renderGroup(type, items);
+        });
+        return html;
+      }
+
+      /* 渲染异火状态 + 技能与能力 */
+      function renderWuHun(wuhunObj, skillsObj) {
+        let html = '';
+
+        if (!$.isEmptyObject(wuhunObj)) {
+          $.each(wuhunObj, (name, info) => {
+            html += `
+            <div class="data-card">
+              <div class="card-title"><span>${name}</span> <span class="card-tag">${info.标签 || '异火'}</span></div>
+              <div class="data-row"><span class="data-label">描述:</span><span class="data-val">${info.描述 || '暂无'}</span></div>
+              <div class="data-row"><span class="data-label">效果:</span><span class="data-val">${info.效果 || '暂无'}</span></div>
+            </div>
+          `;
+          });
+        } else {
+          html += '<div class="empty-hint">暂无异火状态</div>';
+        }
+
+        /* 技能与能力 —— 按类型分组 */
+        if (!$.isEmptyObject(skillsObj)) {
+          html += renderGroupedSubItems(skillsObj, {
+            color: 'var(--gold)',
+            icon: 'ri-flashlight-line',
+            fallbackType: '其他能力',
+            order: ['斗技', '功法', '秘法', '特殊能力'],
+          });
+        }
+
+        return html;
+      }
+
+      /* 渲染装备信息 */
+      function renderEquips(equipObj) {
+        return renderGroupedSubItems(equipObj, {
+          empty: '<div class="empty-hint">暂无装备信息</div>',
+          color: 'var(--accent-light)',
+          icon: 'ri-tools-line',
+          fallbackType: '其他装备',
+        });
+      }
+
+      /* 渲染炼药术与当前状态 */
+      function renderGodAndSpirit(alchemyObj, statusObj) {
+        let html = '';
+
+        if (!$.isEmptyObject(alchemyObj)) {
+          const level = alchemyObj.炼药师等级 || alchemyObj.等级 || '未知';
+          const proficiency = alchemyObj.熟练度 ?? '';
+          html += `
+          <div class="data-card" style="border-color: var(--gold);">
+            <div class="card-title" style="color:var(--gold)"><span><i class="ri-flask-line"></i> 炼药术</span> <span class="card-tag" style="color:var(--gold); border-color:var(--gold)">${level}</span></div>
+            <div class="data-row"><span class="data-label">等级:</span><span class="data-val">${level}</span></div>
+            ${proficiency !== '' ? `<div class="data-row"><span class="data-label">熟练度:</span><span class="data-val">${proficiency}</span></div>` : ''}
+          </div>`;
+        }
+
+        if (!$.isEmptyObject(statusObj)) {
+          html += renderGroupedSubItems(statusObj, {
+            color: 'var(--accent)',
+            icon: 'ri-pulse-line',
+            fallbackType: '状态',
+            order: ['增益', '减益', '特殊'],
+          });
+        }
+
+        if (html === '') return '<div class="empty-hint">暂无炼药与状态信息</div>';
+        return html;
+      }
+
+      /* 渲染任务契约 */
+      function renderStoryMonitor(storyObj) {
+        if ($.isEmptyObject(storyObj)) return '<div class="empty-hint">暂无任务契约数据</div>';
+
+        let html = '';
+        $.each(storyObj, (name, info) => {
+          if (info && typeof info === 'object') {
+            const type = info.类型 || info.标签 || '契约';
+            html += `
+            <div class="data-card">
+              <div class="card-title"><span><i class="ri-scroll-line"></i> ${name}</span> <span class="card-tag">${type}</span></div>
+              ${info.描述 ? `<div class="data-row"><span class="data-label">描述:</span><span class="data-val">${info.描述}</span></div>` : ''}
+              ${info.目标 ? `<div class="data-row"><span class="data-label">目标:</span><span class="data-val">${info.目标}</span></div>` : ''}
+              ${info.进度 ? `<div class="data-row"><span class="data-label">进度:</span><span class="data-val">${info.进度}</span></div>` : ''}
+              ${info.效果 ? `<div class="data-row"><span class="data-label">效果:</span><span class="data-val">${info.效果}</span></div>` : ''}
+              ${info.状态 ? `<div class="data-row"><span class="data-label">状态:</span><span class="data-val">${info.状态}</span></div>` : ''}
+            </div>`;
+          } else {
+            html += `<div class="sub-item"><div class="sub-item-head"><span>${name}</span></div><div class="sub-item-desc">${info}</div></div>`;
+          }
+        });
+        return html || '<div class="empty-hint">暂无任务契约数据</div>';
+      }
+
+      /* 渲染物品栏 —— 按类型分组 */
+      function renderItems(itemsObj) {
+        if ($.isEmptyObject(itemsObj)) return '<div class="empty-hint">物品栏为空</div>';
+
+        /* 按类型分组 */
+        const itemGroups = {};
+        $.each(itemsObj, (name, info) => {
+          const itType = info.类型 || info.标签 || '其他';
+          if (!itemGroups[itType]) itemGroups[itType] = [];
+          itemGroups[itType].push({ name, info });
+        });
+
+        let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+
+        $.each(itemGroups, (itType, items) => {
+          html += `<h4 style="font-size:0.7rem; margin:8px 0 2px 0; color:var(--success); display:flex; align-items:center; gap:4px;"><i class="ri-box-3-line"></i> ${itType}</h4>`;
+          items.forEach(({ name, info }) => {
+              const qty = info.数量;
+              const qtyDisplay = qty !== undefined && qty !== null ? ` ×${qty}` : '';
+              const effect = info.效果 || '';
+              html += `
+            <div class="sub-item" style="border-left-color:var(--success)">
+              <div class="sub-item-head">
+                <span><b>${name}${qtyDisplay}</b></span>
+                <span class="card-tag">${info.标签 || itType}</span>
+              </div>
+              ${info.描述 ? `<div class="sub-item-desc">${info.描述}</div>` : ''}
+              ${effect ? `<div class="sub-item-desc">效果: ${effect}</div>` : ''}
+            </div>
+          `;
+          });
+        });
+
+        html += '</div>';
+        return html;
+      }
+
+      // 6. 羁绊列表 (左列表 + 右详情面板)
+      function renderBonds(relationsObj) {
+        if (!relationsObj || typeof relationsObj !== 'object' || Object.keys(relationsObj).length === 0) {
+          return '<div class="empty-hint">暂无结识的人物</div>';
+        }
+
+        let listHtml =
+          '<div class="bond-section-container" id="bond-container"><div class="bond-list-pane" id="bond-list-pane">';
+        $.each(relationsObj, (name, info) => {
+          if (!name || typeof info !== 'object') return true;
+          const pi = safeGet(info, '基本信息', {});
+          const cultivation = safeGet(info, '修炼与状态', {});
+          const realm = safeGet(cultivation, '斗气境界', '未知');
+          const relation = safeGet(pi, '与主角关系', '未知关系');
+          const thoughts = safeGet(pi, '背景', '');
+          const isNearby = pi.是否在场 === true;
+
+          const safeName = String(name);
+
+          listHtml += `
+          <div class="bond-item-new" data-bond-name="${safeName.replace(/"/g, '&quot;')}">
+            <div class="bond-avatar-box">
+              <img data-char-name="${safeName.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="bond-item-new-info">
+              <div class="bond-item-new-name">
+                ${safeName}
+                ${isNearby ? '<span style="color:var(--success);font-size:0.65rem;">●</span>' : ''}
+              </div>
+              <div class="bond-item-new-tags">
+                <span class="bond-item-new-tag">${pi.性别 || '未知'}</span>
+                <span class="bond-item-new-tag">${pi.身份 || '未知'}</span>
+                <span class="bond-item-new-tag">${realm}</span>
+                <span class="bond-item-new-tag">${relation}</span>
+                ${isNearby ? '<span class="bond-item-new-tag nearby">在场</span>' : ''}
+              </div>
+              ${thoughts ? `<div class="bond-item-new-thought">${thoughts}</div>` : ''}
+            </div>
+            <div class="bond-favor-badge">
+              <i class="ri-links-line"></i> ${relation}
+            </div>
+            <div class="bond-item-new-compact">${safeName}${isNearby ? ' · 在场' : ''}</div>
+          </div>`;
+        });
+        listHtml += '</div><div class="bond-detail-pane" id="bond-detail-pane"></div></div>';
+        return listHtml;
+      }
+
+      /* 渲染羁绊详情面板 */
+      function renderBondDetail(name, info) {
+        const pane = document.getElementById('bond-detail-pane');
+        const container = document.getElementById('bond-container');
+        if (!pane || !container) return;
+        container.classList.add('mode-detail');
+
+        const pi = safeGet(info, '基本信息', {});
+        const cultivation = safeGet(info, '修炼与状态', {});
+        const wuhun = safeGet(cultivation, '已吸收异火', safeGet(info, '异火状态', {}));
+        const skills = safeGet(info, '技能与能力', {});
+        const spirit = safeGet(cultivation, '当前状态', safeGet(info, '当前状态', {}));
+        const equip = safeGet(info, '装备信息', {});
+        const alchemyLevel = safeGet(cultivation, '炼药术等级', '');
+        const god = alchemyLevel ? { 炼药术: { 品级: alchemyLevel, 描述: '' } } : safeGet(info, '炼药术', {});
+        const items = safeGet(info, '物品栏', {});
+        const bond = {};
+        const memories = safeGet(bond, '近期重要记忆', {});
+
+        const cleanName = name.replace(/[\(（].*?[\)）]/g, '').trim();
+
+        let memHtml = '';
+        if (!$.isEmptyObject(memories)) {
+          $.each(memories, (mKey, mVal) => {
+            memHtml += `<div>• [${mKey}] ${mVal}</div>`;
+          });
+        }
+
+        let skillHtml = '';
+        if (!$.isEmptyObject(skills)) {
+          /* 按类型分组：斗技 / 功法 / 秘法 / 特殊能力 */
+          const skGroups = {};
+          $.each(skills, (skName, skInfo) => {
+            const skType = skInfo.类型 || '其他能力';
+            if (!skGroups[skType]) skGroups[skType] = [];
+            skGroups[skType].push({ name: skName, info: skInfo });
+          });
+
+          const skSections = [];
+          const skOrder = ['斗技', '功法', '秘法', '特殊能力'];
+          const skRendered = new Set();
+
+          const renderSkItem = (skType, skName, skInfo) => {
+            const skLevel = skInfo.等级 || '';
+            const skTag = skInfo.标签 || '';
+            const skEffect = skInfo.效果 || '';
+            const skDesc = skInfo.描述 || '';
+            const rightMeta = [skLevel, skTag].filter(Boolean).join(' · ');
+            return `
+            <div class="bd-info-item" style="border-left-color:var(--gold)">
+              <div class="bd-info-name">${skName}</div>
+              <div class="bd-info-grid">
+                <div class="bd-info-left">
+                  ${skDesc ? `<div class="bd-info-desc">${skDesc}</div>` : ''}
+                  ${skEffect ? `<div class="bd-info-effect">效果: ${skEffect}</div>` : ''}
+                </div>
+                <div class="bd-info-right">
+                  <span class="card-tag" style="flex-shrink:0;">${skType}</span>
+                  ${rightMeta ? `<span class="bd-info-tag">${rightMeta}</span>` : ''}
+                </div>
+              </div>
+            </div>`;
+          };
+
+          skOrder.forEach(skType => {
+            const group = skGroups[skType];
+            if (!group) return;
+            skRendered.add(skType);
+            let sItems = '';
+            group.forEach(({ name: skName, info: skInfo }) => {
+              sItems += renderSkItem(skType, skName, skInfo);
+            });
+            skSections.push(sItems);
+          });
+
+          /* 其余类型 */
+          $.each(skGroups, (skType, group) => {
+            if (skRendered.has(skType)) return;
+            let sItems = '';
+            group.forEach(({ name: skName, info: skInfo }) => {
+              sItems += renderSkItem(skType, skName, skInfo);
+            });
+            skSections.push(sItems);
+          });
+
+          if (skSections.length) skillHtml = skSections.join('');
+        }
+
+        let cultHtml = '';
+        if (!$.isEmptyObject(cultivation)) {
+          const lines = [];
+          if (cultivation.斗气境界) lines.push(`斗气境界: ${cultivation.斗气境界}`);
+          if (cultivation.灵魂境界) lines.push(`灵魂境界: ${cultivation.灵魂境界}`);
+          if (cultivation.炼药术等级) lines.push(`炼药术等级: ${cultivation.炼药术等级}`);
+          cultHtml = lines.length > 0 ? `<div class="bdp-row">${lines.join('<br>')}</span></div>` : '';
+        }
+
+        let wuhunHtml = '';
+        if (!$.isEmptyObject(wuhun)) {
+          const wParts = [];
+          $.each(wuhun, (wn, wi) => {
+            const wuTag = wi.标签 || '';
+            const wuDesc = wi.描述 || '';
+            const wuEffect = wi.效果 || '';
+            wParts.push(`
+            <div class="bd-info-item" style="border-left-color:var(--primary)">
+              <div class="bd-info-name">${wn}</div>
+              <div class="bd-info-grid">
+                <div class="bd-info-left">
+                  ${wuDesc ? `<div class="bd-info-desc">${wuDesc}</div>` : ''}
+                  ${wuEffect ? `<div class="bd-info-effect">效果: ${wuEffect}</div>` : ''}
+                </div>
+                <div class="bd-info-right">
+                  <span class="card-tag">异火</span>
+                  ${wuTag ? `<span class="bd-info-tag">${wuTag}</span>` : ''}
+                </div>
+              </div>
+            </div>`);
+          });
+          wuhunHtml = wParts.join('');
+        }
+
+        let equipHtml = '';
+        if (!$.isEmptyObject(equip)) {
+          let eDivs = '';
+          $.each(equip, (sn, si) => {
+              const eqType = si.类型 || '其他装备';
+              const eqTag = si.标签 || '';
+              const eqDesc = si.描述 || '';
+              const eqEffect = si.效果 || '';
+              eDivs += `
+              <div class="bd-info-item" style="border-left-color:var(--accent-light)">
+                <div class="bd-info-name">${sn}</div>
+                <div class="bd-info-grid">
+                  <div class="bd-info-left">
+                    ${eqDesc ? `<div class="bd-info-desc">${eqDesc}</div>` : ''}
+                    ${eqEffect ? `<div class="bd-info-effect">效果: ${eqEffect}</div>` : ''}
+                  </div>
+                  <div class="bd-info-right">
+                    <span class="card-tag">${eqType}</span>
+                    ${eqTag ? `<span class="bd-info-tag">${eqTag}</span>` : ''}
+                  </div>
+                </div>
+              </div>`;
+          });
+          if (eDivs) equipHtml = `<div class="bdp-section"><div class="bdp-section-title" style="font-size:0.65rem;color:var(--accent-light)"><i class="ri-tools-line"></i> 装备信息</div>${eDivs}</div>`;
+        }
+
+        let godHtml = '';
+        if (!$.isEmptyObject(god)) {
+          let gDivs = '';
+          $.each(god, (gn, gi) => {
+            const godGrade = gi.品级 || gi.炼药师等级 || '炼药术';
+            const godTag = gi.标签 || '';
+            const godDesc = gi.描述 || '';
+            /* 专属能力与物品 */
+            let exclusiveHtml = '';
+            const exclusives = safeGet(gi, '专属能力与物品', {});
+            if (!$.isEmptyObject(exclusives)) {
+              const exParts = [];
+              $.each(exclusives, (exName, exInfo) => {
+                let exStr = `· ${exName}${exInfo.类型 ? ' (' + exInfo.类型 + ')' : ''}${exInfo.标签 ? ' ' + exInfo.标签 : ''}`;
+                if (exInfo.效果) exStr += ` → ${exInfo.效果}`;
+                exParts.push(exStr);
+              });
+              exclusiveHtml = `<div style="font-size:0.68rem;color:var(--gold);padding-left:8px;margin-top:2px;">${exParts.join('<br>')}</div>`;
+            }
+            gDivs += `
+            <div class="bd-info-item" style="border-left-color:var(--gold)">
+              <div class="bd-info-name">${gn}</div>
+              <div class="bd-info-grid">
+                <div class="bd-info-left">
+                  ${godDesc ? `<div class="bd-info-desc">${godDesc}</div>` : ''}
+                  ${exclusiveHtml}
+                </div>
+                <div class="bd-info-right">
+                  <span class="card-tag" style="color:var(--gold);border-color:var(--gold)">${godGrade}</span>
+                  ${godTag ? `<span class="bd-info-tag">${godTag}</span>` : ''}
+                </div>
+              </div>
+            </div>`;
+          });
+          if (gDivs) godHtml = gDivs;
+        }
+
+        /* --- 当前状态 --- */
+        let spiritHtml = '';
+        if (!$.isEmptyObject(spirit)) {
+          const spGroups = {};
+          $.each(spirit, (spName, spInfo) => {
+            const spType = (spInfo.类型 || '其他').replace(/[\[\]]/g, '');
+            if (!spGroups[spType]) spGroups[spType] = [];
+            spGroups[spType].push({ name: spName, info: spInfo });
+          });
+
+          const spSections = [];
+          const spTypeOrder = ['增益', '减益', '特殊'];
+          const spRendered = new Set();
+
+          const renderSpItem = (spType, spName, spInfo, spColor) => {
+            const tags = spInfo.标签 || '';
+            const desc = spInfo.描述 || '';
+            const effect = spInfo.效果 || '';
+            return `
+            <div class="bd-info-item" style="border-left-color:${spColor || 'var(--accent)'}">
+              <div class="bd-info-name">${spName}</div>
+              <div class="bd-info-grid">
+                <div class="bd-info-left">
+                  ${desc ? `<div class="bd-info-desc">${desc}</div>` : ''}
+                  ${effect ? `<div class="bd-info-effect">效果: ${effect}</div>` : ''}
+                </div>
+                <div class="bd-info-right">
+                  <span class="card-tag">${spType}</span>
+                  ${tags ? `<span class="bd-info-tag">${tags}</span>` : ''}
+                </div>
+              </div>
+            </div>`;
+          };
+
+          spTypeOrder.forEach(spType => {
+            const group = spGroups[spType];
+            if (!group) return;
+            spRendered.add(spType);
+            const spColor = spType === '减益' ? 'var(--danger)' : spType === '增益' ? 'var(--success)' : 'var(--accent)';
+            let spItems = '';
+            group.forEach(({ name: spName, info: spInfo }) => {
+              spItems += renderSpItem(spType, spName, spInfo, spColor);
+            });
+            spSections.push(spItems);
+          });
+
+          $.each(spGroups, (spType, group) => {
+            if (spRendered.has(spType)) return;
+            let spItems = '';
+            group.forEach(({ name: spName, info: spInfo }) => {
+              spItems += renderSpItem(spType, spName, spInfo, null);
+            });
+            spSections.push(spItems);
+          });
+
+          if (spSections.length) spiritHtml = spSections.join('');
+        }
+
+        /* --- 物品栏 --- */
+        let itemsHtml = '';
+        if (!$.isEmptyObject(items)) {
+          /* 按类型分组 */
+          const itGroups = {};
+          $.each(items, (itName, itInfo) => {
+            const itType = itInfo.类型 || itInfo.标签 || '其他';
+            if (!itGroups[itType]) itGroups[itType] = [];
+            itGroups[itType].push({ name: itName, info: itInfo });
+          });
+
+          const itSections = [];
+          $.each(itGroups, (itType, group) => {
+            let iDivs = '';
+            group.forEach(({ name: itName, info: itInfo }) => {
+              const qty = itInfo.数量;
+              const qtyDisplay = qty !== undefined && qty !== null ? ` ×${qty}` : '';
+              const itTag = itInfo.标签 || '';
+              const itDesc = itInfo.描述 || '';
+              iDivs += `
+              <div class="bd-info-item" style="border-left-color:var(--success)">
+                <div class="bd-info-name">${itName}${qtyDisplay}</div>
+                <div class="bd-info-grid">
+                  <div class="bd-info-left">
+                    ${itDesc ? `<div class="bd-info-desc">${itDesc}</div>` : ''}
+                  </div>
+                  <div class="bd-info-right">
+                    <span class="card-tag">${itType}</span>
+                    ${itTag ? `<span class="bd-info-tag">${itTag}</span>` : ''}
+                  </div>
+                </div>
+              </div>`;
+            });
+            itSections.push(iDivs);
+          });
+
+          if (itSections.length) itemsHtml = itSections.join('');
+        }
+
+        const thought = safeGet(pi, '与主角关系', '');
+
+        pane.innerHTML = `
+          <div class="bdp-header">
+            <div class="bdp-avatar"><img data-char-name="${name.replace(/"/g, '&quot;')}"></div>
+            <div class="bdp-info">
+              <div class="bdp-name">${name}</div>
+              <div class="bdp-meta">
+                <span>${pi.性别 || '未知'}</span>
+                <span>${pi.种族 || '未知'}</span>
+                <span>${pi.身份 || '未知'}</span>
+                ${thought ? `<span>${thought}</span>` : ''}
+                ${pi.是否在场 ? '<span style="color:var(--success)">● 在场</span>' : ''}
+              </div>
+            </div>
+            <button class="bdp-close" id="bdp-close-btn"><i class="ri-close-line"></i></button>
+          </div>
+          <div class="bdp-body">
+            ${thought ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-chat-quote-line"></i> 与主角关系</div><div class="bdp-row" style="font-style:italic;color:var(--accent)">${thought}</div></div>` : ''}
+            <div class="bdp-section">
+              <div class="bdp-section-title"><i class="ri-user-2-line"></i> 基本信息</div>
+              <div class="bdp-row"><span class="bdp-row-label">外貌</span><span class="bdp-row-val">${pi.外貌 || '暂无'}</span></div>
+              <div class="bdp-row"><span class="bdp-row-label">背景</span><span class="bdp-row-val">${pi.背景 || '暂无'}</span></div>
+            </div>
+            ${cultHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-upload-cloud-2-line"></i> 修炼与状态</div>${cultHtml}</div>` : ''}
+            ${wuhunHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-fire-line"></i> 异火状态</div>${wuhunHtml}</div>` : ''}
+            ${spiritHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-pulse-line"></i> 当前状态</div>${spiritHtml}</div>` : ''}
+            ${godHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-flask-line"></i> 炼药术</div>${godHtml}</div>` : ''}
+            ${equipHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-shield-star-line"></i> 装备</div>${equipHtml}</div>` : ''}
+            ${skillHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-flashlight-line"></i> 技能与能力</div>${skillHtml}</div>` : ''}
+            ${itemsHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-shopping-bag-line"></i> 物品栏</div>${itemsHtml}</div>` : ''}
+            ${memHtml ? `<div class="bdp-section"><div class="bdp-section-title"><i class="ri-bookmark-line"></i> 羁绊记忆</div><div class="bdp-row"><span class="bdp-row-val">${memHtml}</span></div></div>` : ''}
+          </div>`;
+
+        setupAllAvatars();
+        document.getElementById('bdp-close-btn')?.addEventListener('click', closeBondDetail);
+      }
+
+      /* 关闭羁绊详情面板 */
+      function closeBondDetail() {
+        const container = document.getElementById('bond-container');
+        const pane = document.getElementById('bond-detail-pane');
+        if (container) container.classList.remove('mode-detail');
+        if (pane) pane.innerHTML = '';
+        document.querySelectorAll('.bond-item-new.active').forEach(c => c.classList.remove('active'));
+      }
+
+      /* 主题应用逻辑 */
+      function applySavedTheme() {
+        const savedTheme = localStorage.getItem('mvu_status_theme') || 'night';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+
+      /* 绑定前端交互事件 */
+      function bindEvents() {
+        $('#app')
+          .off('click', '.tab-item')
+          .on('click', '.tab-item', function () {
+            $('.tab-item').removeClass('active');
+            $(this).addClass('active');
+
+            $('.tab-pane').removeClass('active');
+            $(`#pane-${$(this).data('tab')}`).addClass('active');
+          });
+
+        /* 点击羁绊列表项 → 显示详情面板 */
+        $('#app')
+          .off('click', '.bond-item-new[data-bond-name]')
+          .on('click', '.bond-item-new[data-bond-name]', function () {
+            const name = $(this).data('bond-name');
+            if (!name) return;
+
+            $('.bond-item-new').removeClass('active');
+            $(this).addClass('active');
+
+            const allVars = typeof getAllVariables === 'function' ? getAllVariables() : {};
+            const data = safeGet(allVars, 'stat_data', {});
+            const bondInfo = safeGet(data, `关系列表.${name}`, {});
+            if (!$.isEmptyObject(bondInfo)) {
+              renderBondDetail(name, bondInfo);
+            }
+          });
+
+        /* 主题菜单展开/收起 */
+        $('#app')
+          .off('click', '#themeToggleBtn')
+          .on('click', '#themeToggleBtn', function (e) {
+            e.stopPropagation();
+            $('#themeMenu').toggleClass('show');
+          });
+
+        /* 刷新按钮 —— 清除头像缓存并重新获取变量渲染 */
+        $('#app')
+          .off('click', '#refreshBtn')
+          .on('click', '#refreshBtn', function (e) {
+            e.stopPropagation();
+            const $btn = $(this);
+            $btn.addClass('spin-anim');
+            // 清除头像缓存，强制重新搜索图床
+            avatarCache.clear();
+            renderStatusBar();
+            setTimeout(() => $btn.removeClass('spin-anim'), 600);
+          });
+
+        /* 切换主题 */
+        $('#app')
+          .off('click', '.theme-option')
+          .on('click', '.theme-option', function (e) {
+            e.stopPropagation();
+            const theme = $(this).data('theme-val');
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('mvu_status_theme', theme);
+            $('#themeMenu').removeClass('show');
+          });
+      }
+
+      /* 初始化与生命周期 */
+      async function init() {
+        if (typeof waitGlobalInitialized === 'function') {
+          await waitGlobalInitialized('Mvu');
+        }
+
+        /* 全局点击：关闭详情面板（仅点击面板外和列表外时） */
+        $(document).on('click', function (e) {
+          if ($(e.target).closest('#bond-detail-pane, .bond-item-new').length === 0) {
+            closeBondDetail();
+          }
+        });
+
+        /* 全局点击：点击其他区域关闭主题菜单 */
+        $(document).on('click', function () {
+          $('#themeMenu').removeClass('show');
+        });
+
+        renderStatusBar();
+
+        if (typeof eventOn === 'function' && typeof Mvu !== 'undefined') {
+          eventOn(Mvu.events.VARIABLE_UPDATE_ENDED, () => {
+            renderStatusBar();
+          });
+        }
+      }
+
+      /* 启动入口 */
+      $(() => {
+        if (typeof errorCatched === 'function') {
+          errorCatched(init)();
+        } else {
+          init().catch(console.error);
+        }
+      });
+    </script>
+  </body>
+</html>
+```
